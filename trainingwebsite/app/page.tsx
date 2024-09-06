@@ -86,7 +86,7 @@ export default function Auth() {
           </Form.Field>
           <div className="mb-2.5 hover:text-textHover">
             <Link href={"/createAccount"}>
-              Don't have an account? Create one here!
+              Do not have an account? Create one here!
             </Link>
           </div>
           <Form.Submit asChild>
