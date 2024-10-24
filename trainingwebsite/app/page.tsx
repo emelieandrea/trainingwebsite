@@ -1,5 +1,6 @@
 "use client";
 
+import app from "../firebase";
 import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { Button } from "@radix-ui/themes";
@@ -16,7 +17,7 @@ export default function Auth() {
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault(); // Prevent the default form submission
 
-    const auth = getAuth();
+    const auth = getAuth(app);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         router.push("/home");
