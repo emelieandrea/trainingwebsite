@@ -12,7 +12,7 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 
 type Props = {};
 
-export default function Home({}: Props) {
+export default function CreateAccount({}: Props) {
   const auth = getAuth(app);
   const router = useRouter();
   const [email, setEmail] = useState("");

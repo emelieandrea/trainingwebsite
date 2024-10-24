@@ -1,5 +1,7 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+"use client";
 
+import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import app from "../firebase";
 import {
   Sidebar,
   SidebarContent,
@@ -9,38 +11,53 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "../components/ui/sidebar";
+import { getAuth, signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 // Menu items.
 const items = [
   {
-    title: "Home",
+    title: "Hem",
     url: "/home",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "/home",
+    title: "Mina träningspass",
+    url: "/workouts",
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "/home",
+    title: "Mina övningar",
+    url: "/exercises",
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "/home",
+    title: "Skapa träningspass",
+    url: "/createWorkout",
     icon: Search,
   },
   {
-    title: "Settings",
-    url: "/home",
+    title: "Min profil",
+    url: "/profile",
     icon: Settings,
   },
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
+  const handleSignOut = async (event: React.FormEvent) => {
+    const auth = getAuth(app);
+    signOut(auth)
+      .then(() => {
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log("Error code:", error.code);
+        console.log("Error message:", error.message);
+      });
+  };
   return (
     <Sidebar>
       <SidebarContent>
@@ -62,6 +79,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <div
+          className="flex items-center mb-2 hover:cursor-pointer"
+          onClick={handleSignOut}
+        >
+          <Settings />
+          <span className="ml-2">Logga ut</span>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

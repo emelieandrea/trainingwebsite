@@ -4,7 +4,7 @@ import { AppSidebar } from "../../components/app-sidebar";
 
 type Props = {};
 
-export default function Home({}: Props) {
+export default function Workouts({}: Props) {
   return (
     <>
       <SidebarProvider>
