@@ -1,4 +1,4 @@
-import { Button } from "@radix-ui/themes";
+import { Button, Link } from "@radix-ui/themes";
 import { SidebarProvider, SidebarTrigger } from "../../components/ui/sidebar";
 import { AppSidebar } from "../../components/app-sidebar";
 
@@ -17,9 +17,21 @@ export default function Home({}: Props) {
             <p className="flex justify-center w-full text-xl font-bold">
               Kul med träning!
             </p>
-            <Button size="4">Mina träningspass</Button>
-            <Button size="4">Mina övningar</Button>
-            <Button size="4">Skapa träningspass</Button>
+            <Link href={"/workouts"}>
+              <Button size="4" style={{ minWidth: "250px" }}>
+                Mina träningspass
+              </Button>
+            </Link>
+            <Link href={"/exercises"}>
+              <Button size="4" style={{ minWidth: "250px" }}>
+                Mina övningar
+              </Button>
+            </Link>
+            <Link href={"/createWorkout"}>
+              <Button size="4" style={{ minWidth: "250px" }}>
+                Skapa träningspass
+              </Button>
+            </Link>
           </div>
         </div>
       </SidebarProvider>
