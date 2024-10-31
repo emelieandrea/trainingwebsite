@@ -6,7 +6,7 @@ import app, { db } from "../../firebase";
 import { Button, Link } from "@radix-ui/themes";
 import "@radix-ui/themes/tokens/colors/teal.css";
 import * as Form from "@radix-ui/react-form";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 
@@ -24,7 +24,6 @@ export default function CreateAccount({}: Props) {
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        // Signed up
         const user = userCredential.user;
         await addDoc(collection(db, "users"), {
           id: user.uid,
