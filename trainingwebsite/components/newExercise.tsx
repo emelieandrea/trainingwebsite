@@ -14,7 +14,7 @@ import { Button } from "../components/ui/button";
 
 const NewExercise = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [value, setValue] = useState(""); // Selected exercise type ID
+  const [value, setValue] = useState("");
   const [exerciseTypes, setExerciseTypes] = useState<
     { id: string; name: string }[]
   >([]);
@@ -41,11 +41,10 @@ const NewExercise = () => {
   }, []);
 
   const saveExercise = async () => {
-    const name = nameRef.current?.value || ""; // Retrieve the name input value
-    const description = descriptionRef.current?.value || ""; // Retrieve the description input value
+    const name = nameRef.current?.value || "";
+    const description = descriptionRef.current?.value || "";
 
     if (name && description && value) {
-      // Ensure fields are filled
       try {
         await addDoc(collection(db, "exercises"), {
           name,
@@ -53,19 +52,19 @@ const NewExercise = () => {
           type: value,
         });
         console.log("Exercise saved successfully!");
-        setErrorMessage(""); // Clear any error
-        setDialogOpen(false); // Close dialog on success
+        setErrorMessage("");
+        setDialogOpen(false);
       } catch (error) {
         console.error("Error saving exercise: ", error);
-        setErrorMessage("Det gick inte att spara övningen. Försök igen."); // Error handling
+        setErrorMessage("Det gick inte att spara övningen. Försök igen.");
       }
     } else {
-      setErrorMessage("Du måste fylla i alla fälten."); // Display message if fields are missing
+      setErrorMessage("Du måste fylla i alla fälten.");
     }
   };
   const closeDialog = () => {
-    setErrorMessage(""); // Clear any error
-    setDialogOpen(false); // Close dialog on success
+    setErrorMessage("");
+    setDialogOpen(false);
   };
 
   return (

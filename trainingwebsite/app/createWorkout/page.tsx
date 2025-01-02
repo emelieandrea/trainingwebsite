@@ -65,11 +65,11 @@ export default function CreateWorkout() {
 
         if (!querySnapshot.empty) {
           const workoutDoc = querySnapshot.docs[0];
-          const workoutId = workoutDoc.id; // Store the workout ID in a variable
-          setWorkout(workoutId); // Set the state
+          const workoutId = workoutDoc.id;
+          setWorkout(workoutId);
           console.log("fetching exercises");
-          console.log("workout: ", workoutId); // Log the workout ID
-          await fetchExercises(workoutId); // Pass the workout ID directly
+          console.log("workout: ", workoutId);
+          await fetchExercises(workoutId);
         } else {
           console.log("No active workout found, creating new workout");
           const newWorkoutDoc = await addDoc(collection(db, "workouts"), {
@@ -130,7 +130,7 @@ export default function CreateWorkout() {
                   key={exercise.id}
                   name={exercise.name}
                   sets={exercise.sets}
-                  set={exercise.set} // Make sure this is structured correctly
+                  set={exercise.set}
                   leftright={exercise.leftright}
                   level={exercise.level}
                   sameSet={exercise.sameSet}

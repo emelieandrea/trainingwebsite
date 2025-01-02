@@ -23,10 +23,8 @@ const ExerciseCard: React.FC<Props> = ({
       <Card asChild>
         <div>
           <h3>{name}</h3>
-          {/* Display additional exercise details here */}
           <p>Sets: {sets}</p>
           <p>Level: {level}</p>
-          {/* You might want to format and display the `set` array */}
           {set.map((s, index) => (
             <p key={index}>
               Set {index + 1}: {s.reps} reps at {s.weight} kg

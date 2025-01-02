@@ -20,7 +20,7 @@ export default function CreateAccount({}: Props) {
   const [name, setName] = useState("");
 
   const handleSignUp = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
@@ -75,7 +75,7 @@ export default function CreateAccount({}: Props) {
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} // Update email state
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Control>
           </Form.Field>
@@ -95,7 +95,7 @@ export default function CreateAccount({}: Props) {
               <input
                 className="box-border w-full bg-blackA2 shadow-blackA6 inline-flex h-[35px] appearance-none items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none text-black shadow-[0_0_0_1px] outline-none hover:shadow-[0_0_0_1px_black] focus:shadow-[0_0_0_2px_black] selection:color-white selection:bg-blackA6"
                 required
-                onChange={(e) => setName(e.target.value)} // Update email state
+                onChange={(e) => setName(e.target.value)}
               />
             </Form.Control>
           </Form.Field>
@@ -117,7 +117,7 @@ export default function CreateAccount({}: Props) {
                 type="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} // Update password state
+                onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Control>
           </Form.Field>

@@ -42,7 +42,6 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   >([]);
 
   useEffect(() => {
-    // Set up a real-time listener for the "exercises" collection
     const unsubscribe = onSnapshot(collection(db, "exercises"), (snapshot) => {
       const exercisesList = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -50,41 +49,34 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
         description: doc.data().description,
         ...doc.data(),
       }));
-      setExercises(exercisesList); // Update state whenever data changes
+      setExercises(exercisesList);
     });
 
-    // Clean up the listener when the component unmounts
     return () => unsubscribe();
   }, []);
 
-  // Handle changes for the "Antal set..." input field
   const handleSetChange = (e: { target: { value: string } }) => {
     const value = parseInt(e.target.value) || 1;
     setNumSets(value);
   };
 
-  // Handle checkbox toggle
   const handleCheckboxClick = () => {
-    setCheckboxChecked((prev) => !prev); // Toggle the checkbox state
+    setCheckboxChecked((prev) => !prev);
   };
 
   const handleCheckboxLRClick = () => {
-    setCheckboxLRChecked((prev) => !prev); // Toggle the checkbox state
+    setCheckboxLRChecked((prev) => !prev);
   };
 
-  // Dynamically calculate the number of fields to display based on conditions
   const renderedFields = checkboxChecked || !numSets ? 1 : numSets;
 
   const saveExercise = async () => {
     if (workout) {
-      // Reference to the specific workout document
       const workoutDocRef = doc(db, "workouts", workout);
 
-      // Reference to the exercises subcollection
       const exercisesCollectionRef = collection(workoutDocRef, "exercises");
 
       try {
-        // Add the new exercise document to the subcollection
         await addDoc(exercisesCollectionRef, {
           name: value,
           ref: doc(db, "exercises", value),
@@ -97,10 +89,10 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
           },
         });
         console.log("Exercise added successfully!");
-        value && setValue(""); // Clear the selected exercise
-        numSets && setNumSets(1); // Reset the number of sets
-        setCheckboxChecked(true); // Reset the checkbox state
-        setCheckboxLRChecked(false); // Reset the checkbox state
+        value && setValue("");
+        numSets && setNumSets(1);
+        setCheckboxChecked(true);
+        setCheckboxLRChecked(false);
       } catch (error) {
         console.error("Error adding exercise:", error);
       }
@@ -155,7 +147,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                                   : "opacity-0"
                               )}
                             />
-                            {exercise.name} {/* Display the exercise name */}
+                            {exercise.name}
                           </CommandItem>
                         ))}
                       </CommandGroup>
