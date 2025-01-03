@@ -10,35 +10,28 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
-import { Button } from "../components/ui/button";
+import { CustomButton } from "../components/ui/button";
 
 const NewExercise = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [value, setValue] = useState("");
-  const [exerciseTypes, setExerciseTypes] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const [toolsList, setTools] = useState<{ id: string; name: string }[]>([]);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "exerciseType"),
-      (snapshot) => {
-        const exerciseTypesList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          name: doc.data().name,
-        }));
-        setExerciseTypes(exerciseTypesList);
-        if (exerciseTypesList.length > 0) {
-          setValue(exerciseTypesList[0].id);
-        }
-      }
-    );
+    const unsubscribe = onSnapshot(collection(db, "tools"), (snapshot) => {
+      const toolsList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setTools(toolsList);
+    });
+
     return () => unsubscribe();
-  }, []);
+  });
 
   const saveExercise = async () => {
     const name = nameRef.current?.value || "";
@@ -103,7 +96,7 @@ const NewExercise = () => {
                 value={value}
                 onValueChange={setValue}
               >
-                {exerciseTypes.map((type) => (
+                {toolsList.map((type) => (
                   <RadioGroup.Item
                     key={type.id}
                     value={type.id}
@@ -120,10 +113,10 @@ const NewExercise = () => {
             <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
           )}
           <Flex gap="3" mt="4" justify="end">
-            <Button color="gray" onClick={closeDialog}>
-              Cancel
-            </Button>
-            <Button onClick={saveExercise}>Save</Button>
+            <CustomButton color="gray" onClick={closeDialog}>
+              Avbryt
+            </CustomButton>
+            <CustomButton onClick={saveExercise}>Spara</CustomButton>
           </Flex>
         </Dialog.Content>
       </Dialog.Root>

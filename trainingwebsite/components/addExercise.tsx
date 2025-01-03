@@ -1,9 +1,16 @@
 "use client";
-import { Box, Card, Checkbox, Flex, TextField } from "@radix-ui/themes";
+import {
+  Box,
+  Card,
+  Checkbox,
+  Flex,
+  RadioCards,
+  TextField,
+} from "@radix-ui/themes";
 import React, { useEffect, useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "../lib/utils";
-import { Button } from "../components/ui/button";
+import { CustomButton } from "../components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -40,6 +47,9 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   const [exercises, setExercises] = useState<
     { id: string; name: string; description: string }[]
   >([]);
+  const [level, setLevel] = useState("Lätt som en plätt!");
+  const [repsInput, setRepsInput] = useState<string[]>([]);
+  const [weightsInput, setWeightsInput] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "exercises"), (snapshot) => {
@@ -70,11 +80,28 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
 
   const renderedFields = checkboxChecked || !numSets ? 1 : numSets;
 
+  const handleInputChange = (index: number, type: string, value: string) => {
+    const updatedArray = type === "reps" ? [...repsInput] : [...weightsInput];
+    updatedArray[index] = value;
+    if (type === "reps") setRepsInput(updatedArray);
+    else setWeightsInput(updatedArray);
+  };
+
   const saveExercise = async () => {
     if (workout) {
       const workoutDocRef = doc(db, "workouts", workout);
 
       const exercisesCollectionRef = collection(workoutDocRef, "exercises");
+
+      const setsArrayToSave = checkboxChecked
+        ? Array.from({ length: numSets }, () => ({
+            repetitions: repsInput[0] || 0,
+            weight: weightsInput[0] || 0,
+          }))
+        : Array.from({ length: numSets }, (_, index) => ({
+            repetitions: repsInput[index] || 0,
+            weight: weightsInput[index] || 0,
+          }));
 
       try {
         await addDoc(exercisesCollectionRef, {
@@ -83,16 +110,15 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
           sets: numSets,
           sameSet: checkboxChecked,
           leftright: checkboxLRChecked,
-          set: {
-            repetitions: 0,
-            weight: 0,
-          },
+          set: setsArrayToSave,
+          level: level,
         });
         console.log("Exercise added successfully!");
         value && setValue("");
         numSets && setNumSets(1);
         setCheckboxChecked(true);
         setCheckboxLRChecked(false);
+        console.log("returned states to default");
       } catch (error) {
         console.error("Error adding exercise:", error);
       }
@@ -109,18 +135,18 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
             <Flex direction="row" gap="3" align="center">
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                  <Button
+                  <CustomButton
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
                     className="w-[330px] justify-between"
                   >
                     {value
-                      ? exercises.find((exercise) => exercise.id === value)
+                      ? exercises.find((exercise) => exercise.name === value)
                           ?.name
                       : "Välj övning..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
+                  </CustomButton>
                 </PopoverTrigger>
                 <PopoverContent className="w-[330px] p-0">
                   <Command>
@@ -131,7 +157,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                         {exercises.map((exercise) => (
                           <CommandItem
                             key={exercise.id}
-                            value={exercise.id}
+                            value={exercise.name}
                             onSelect={(currentValue) => {
                               setValue(
                                 currentValue === value ? "" : currentValue
@@ -188,6 +214,9 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   <TextField.Root
                     placeholder="Vikt (kg)"
                     style={{ minWidth: "150px" }}
+                    onChange={(e) =>
+                      handleInputChange(index, "weight", e.target.value)
+                    }
                   />
                 </label>
                 <label>
@@ -196,12 +225,42 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   <TextField.Root
                     placeholder="Antal repetitioner"
                     style={{ minWidth: "200px" }}
+                    onChange={(e) =>
+                      handleInputChange(index, "reps", e.target.value)
+                    }
                   />
                 </label>
               </Flex>
             ))}
+            <Box maxWidth="600px">
+              <RadioCards.Root
+                defaultValue="1"
+                size="1"
+                columns={{ initial: "1", sm: "3" }}
+                value={value}
+                onValueChange={setLevel}
+              >
+                <RadioCards.Item value="1">
+                  <Flex direction="column" width="100%">
+                    Lätt som en plätt!
+                  </Flex>
+                </RadioCards.Item>
+                <RadioCards.Item value="2">
+                  <Flex direction="column" width="100%">
+                    Lagom kämpigt
+                  </Flex>
+                </RadioCards.Item>
+                <RadioCards.Item value="3">
+                  <Flex direction="column" width="100%">
+                    Riktigt tufft!
+                  </Flex>
+                </RadioCards.Item>
+              </RadioCards.Root>
+            </Box>
             <Flex gap="3" mt="4" justify="end">
-              <Button onClick={saveExercise}>Lägg till övning</Button>
+              <CustomButton onClick={saveExercise}>
+                Lägg till övning
+              </CustomButton>
             </Flex>
           </Flex>
         </Card>
