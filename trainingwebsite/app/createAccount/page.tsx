@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import app, { db } from "../../firebase";
+import { app, db } from "../../firebase";
 import { Button, Link } from "@radix-ui/themes";
 import "@radix-ui/themes/tokens/colors/teal.css";
 import * as Form from "@radix-ui/react-form";
