@@ -1,4 +1,5 @@
 import { Box, Card } from "@radix-ui/themes";
+import { Bold } from "lucide-react";
 import React from "react";
 
 interface Props {
@@ -19,16 +20,23 @@ const ExerciseCard: React.FC<Props> = ({
   sets,
 }) => {
   return (
-    <Box maxWidth="420px">
+    <Box maxWidth="420px" className="my-2">
       <Card asChild>
         <div>
           <h3>{name}</h3>
           {set.map((s, index) => (
             <p key={index}>
-              Set {index + 1}: {s.repetitions} reps at {s.weight} kg
+              Set {index + 1}: {s.repetitions} repetitioner med {s.weight} kg
             </p>
           ))}
-          <p>Left/Right: {leftright ? "Yes" : "No"}</p>
+          <p>{leftright ? "Uppdelat i höger och vänster" : ""}</p>
+          <p>
+            {level == 1
+              ? "Borde ta tyngre nästa gång"
+              : level == 2
+              ? "Detta var en bra nivå"
+              : "Lite gränsfall till för tungt"}
+          </p>
         </div>
       </Card>
     </Box>

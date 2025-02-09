@@ -47,7 +47,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   const [exercises, setExercises] = useState<
     { id: string; name: string; description: string }[]
   >([]);
-  const [level, setLevel] = useState("Lätt som en plätt!");
+  const [level, setLevel] = useState("2");
   const [repsInput, setRepsInput] = useState<string[]>([]);
   const [weightsInput, setWeightsInput] = useState<string[]>([]);
 
@@ -115,9 +115,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
         });
         console.log("Exercise added successfully!");
         value && setValue("");
-        numSets && setNumSets(1);
-        setCheckboxChecked(true);
-        setCheckboxLRChecked(false);
+        setLevel("2");
         console.log("returned states to default");
       } catch (error) {
         console.error("Error adding exercise:", error);
@@ -232,27 +230,39 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                 </label>
               </Flex>
             ))}
-            <Box maxWidth="600px">
+            <Box className="w-full">
               <RadioCards.Root
-                defaultValue="1"
+                defaultValue="2"
                 size="1"
-                columns={{ initial: "1", sm: "3" }}
-                value={value}
+                style={{
+                  display: "flex",
+                  width: "100%",
+                }}
+                value={level}
                 onValueChange={setLevel}
               >
-                <RadioCards.Item value="1">
+                <RadioCards.Item
+                  value="1"
+                  style={{ flex: 1, textAlign: "center" }}
+                >
                   <Flex direction="column" width="100%">
-                    Lätt som en plätt!
+                    1
                   </Flex>
                 </RadioCards.Item>
-                <RadioCards.Item value="2">
+                <RadioCards.Item
+                  value="2"
+                  style={{ flex: 1, textAlign: "center" }}
+                >
                   <Flex direction="column" width="100%">
-                    Lagom kämpigt
+                    2
                   </Flex>
                 </RadioCards.Item>
-                <RadioCards.Item value="3">
+                <RadioCards.Item
+                  value="3"
+                  style={{ flex: 1, textAlign: "center" }}
+                >
                   <Flex direction="column" width="100%">
-                    Riktigt tufft!
+                    3
                   </Flex>
                 </RadioCards.Item>
               </RadioCards.Root>

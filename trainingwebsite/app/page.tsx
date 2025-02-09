@@ -1,31 +1,43 @@
 "use client";
 
-import app from "../firebase";
 import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { Button } from "@radix-ui/themes";
 import "@radix-ui/themes/tokens/colors/teal.css";
 import * as Form from "@radix-ui/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Auth() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { user, loading } = useAuth();
+
+  // Check if still loading
+  if (loading) return <p>Loading...</p>;
+
+  // If user is already signed in, redirect to home
+  if (user) {
+    router.push("/home");
+    return null;
+  }
 
   const handleSignIn = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
+    const auth = getAuth();
 
-    const auth = getAuth(app);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        router.push("/home");
-      })
-      .catch((error) => {
-        console.log("Error code:", error.code);
-        console.log("Error message:", error.message);
-      });
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/home");
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
   };
 
   return (

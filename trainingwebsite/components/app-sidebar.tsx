@@ -1,7 +1,6 @@
 "use client";
 
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-import app from "../firebase";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +14,7 @@ import {
 } from "../components/ui/sidebar";
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { app } from "../firebase";
 
 // Menu items.
 const items = [
@@ -47,16 +47,21 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter();
-  const handleSignOut = async (event: React.FormEvent) => {
+  const handleSignOut = async () => {
     const auth = getAuth(app);
-    signOut(auth)
-      .then(() => {
-        router.push("/");
-      })
-      .catch((error) => {
-        console.log("Error code:", error.code);
-        console.log("Error message:", error.message);
-      });
+
+    try {
+      // Sign out the user from Firebase
+      await signOut(auth);
+      console.log("Successfully signed out");
+
+      // Redirect to the home page (or login page)
+      router.push("/");
+    } catch (error) {
+      // Handle error during sign-out
+      console.error("Error during sign out:", error);
+      alert("An error occurred while signing out. Please try again.");
+    }
   };
   return (
     <Sidebar>

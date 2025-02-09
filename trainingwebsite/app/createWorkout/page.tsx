@@ -8,97 +8,76 @@ import {
   addDoc,
   collection,
   doc,
-  getDocs,
+  onSnapshot,
   query,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { DocumentReference, DocumentData } from "firebase/firestore";
 import ExerciseCard from "../../components/exerciseCard";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function CreateWorkout() {
   const [workout, setWorkout] = useState("");
-  const [userRef, setUserRef] =
-    useState<DocumentReference<DocumentData> | null>(null);
-  const [userReady, setUserReady] = useState(false);
-  const auth = getAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [exercises, setExercises] = useState<
     { id: string; [key: string]: any }[]
   >([]);
 
+  // Redirect to login if not logged in
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userQuery = query(
-          collection(db, "users"),
-          where("id", "==", user.uid)
-        );
-        const queryUserSnapshot = await getDocs(userQuery);
+    if (loading) return;
+    if (!user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
 
-        if (!queryUserSnapshot.empty) {
-          const userDoc = queryUserSnapshot.docs[0];
-          setUserRef(userDoc.ref);
-          setUserReady(true);
-        } else {
-          router.push("/");
-        }
+  // Get active workout or create new one
+  useEffect(() => {
+    if (!user || loading) return;
+
+    const workoutsQuery = query(
+      collection(db, "workouts"),
+      where("owner", "==", user.uid),
+      where("finished", "==", false)
+    );
+
+    const unsubscribe = onSnapshot(workoutsQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        setWorkout(snapshot.docs[0].id);
+      } else {
+        console.log("No active workout found, creating new workout");
+        addDoc(collection(db, "workouts"), {
+          owner: user.uid,
+          finished: false,
+        }).then((newWorkoutDoc) => setWorkout(newWorkoutDoc.id));
       }
     });
 
     return () => unsubscribe();
-  }, [auth, router]);
+  }, [user]);
 
+  // Get exercises for active workout
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      if (userRef) {
-        const workoutsQuery = query(
-          collection(db, "workouts"),
-          where("owner", "==", userRef),
-          where("finished", "==", false)
-        );
+    if (!workout) return;
 
-        const querySnapshot = await getDocs(workoutsQuery);
-
-        if (!querySnapshot.empty) {
-          const workoutDoc = querySnapshot.docs[0];
-          const workoutId = workoutDoc.id;
-          setWorkout(workoutId);
-          console.log("fetching exercises");
-          console.log("workout: ", workoutId);
-          await fetchExercises(workoutId);
-        } else {
-          console.log("No active workout found, creating new workout");
-          const newWorkoutDoc = await addDoc(collection(db, "workouts"), {
-            owner: userRef,
-            finished: false,
-          });
-          setWorkout(newWorkoutDoc.id);
-        }
+    const unsubscribe = onSnapshot(
+      collection(db, "workouts", workout, "exercises"),
+      (snapshot) => {
+        const exercisesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setExercises(exercisesData);
+        console.log("Exercises updated:", exercisesData);
       }
-    };
-
-    if (userReady) {
-      fetchWorkouts();
-    }
-  }, [userRef, userReady]);
-
-  const fetchExercises = async (workoutId: string) => {
-    const exercisesQuery = query(
-      collection(doc(db, "workouts", workoutId), "exercises")
     );
+    return () => unsubscribe();
+  }, [workout]);
 
-    const querySnapshot = await getDocs(exercisesQuery);
-    const exercisesData = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setExercises(exercisesData);
-  };
-
+  // Save workout
   const saveWorkout = async () => {
     if (workout) {
       const workoutDocRef = doc(db, "workouts", workout);
@@ -137,7 +116,11 @@ export default function CreateWorkout() {
                 />
               ))}
             </div>
-            <Button onClick={saveWorkout} size="4">
+            <Button
+              onClick={saveWorkout}
+              size="4"
+              style={{ marginBottom: "70px" }}
+            >
               Spara träningspass
             </Button>
           </div>
