@@ -29,6 +29,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDocs,
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
@@ -52,17 +53,22 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   const [weightsInput, setWeightsInput] = useState<string[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "exercises"), (snapshot) => {
-      const exercisesList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-        description: doc.data().description,
-        ...doc.data(),
-      }));
-      setExercises(exercisesList);
-    });
-
-    return () => unsubscribe();
+    const fetchExercises = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "exercises"));
+        setExercises(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            name: doc.data().name,
+            description: doc.data().description,
+            ...doc.data(),
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching exercises:", error);
+      }
+    };
+    fetchExercises();
   }, []);
 
   const handleSetChange = (e: { target: { value: string } }) => {

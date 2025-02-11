@@ -8,6 +8,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDocs,
   onSnapshot,
   query,
   updateDoc,
@@ -38,26 +39,35 @@ export default function CreateWorkout() {
   useEffect(() => {
     if (!user || loading) return;
 
-    const workoutsQuery = query(
-      collection(db, "workouts"),
-      where("owner", "==", user.uid),
-      where("finished", "==", false)
-    );
+    const fetchWorkout = async () => {
+      try {
+        const workoutsQuery = query(
+          collection(db, "workouts"),
+          where("owner", "==", user.uid),
+          where("finished", "==", false)
+        );
 
-    const unsubscribe = onSnapshot(workoutsQuery, (snapshot) => {
-      if (!snapshot.empty) {
-        setWorkout(snapshot.docs[0].id);
-      } else {
-        console.log("No active workout found, creating new workout");
-        addDoc(collection(db, "workouts"), {
-          owner: user.uid,
-          finished: false,
-        }).then((newWorkoutDoc) => setWorkout(newWorkoutDoc.id));
+        const snapshot = await getDocs(workoutsQuery);
+
+        if (!snapshot.empty) {
+          setWorkout(snapshot.docs[0].id);
+        } else {
+          console.log("No active workout found, creating new workout");
+
+          const newWorkoutDoc = await addDoc(collection(db, "workouts"), {
+            owner: user.uid,
+            finished: false,
+          });
+
+          setWorkout(newWorkoutDoc.id);
+        }
+      } catch (error) {
+        console.error("Error fetching workout:", error);
       }
-    });
+    };
 
-    return () => unsubscribe();
-  }, [user]);
+    fetchWorkout();
+  }, [user, loading]);
 
   // Get exercises for active workout
   useEffect(() => {

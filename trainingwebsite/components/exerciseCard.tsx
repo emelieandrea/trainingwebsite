@@ -1,5 +1,4 @@
 import { Box, Card } from "@radix-ui/themes";
-import { Bold } from "lucide-react";
 import React from "react";
 
 interface Props {
