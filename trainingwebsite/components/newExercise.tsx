@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import React, { useEffect, useRef, useState } from "react";
-import { addDoc, collection, getDocs, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { CustomButton } from "../components/ui/button";
 
@@ -24,9 +24,9 @@ const NewExercise = () => {
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "tools"));
+        const tools = await getDocs(collection(db, "tools"));
         setTools(
-          snapshot.docs.map((doc) => ({ id: doc.id, name: doc.data().name }))
+          tools.docs.map((doc) => ({ id: doc.id, name: doc.data().name }))
         );
       } catch (error) {
         console.error("Error fetching tools:", error);
@@ -42,7 +42,7 @@ const NewExercise = () => {
 
     if (name && description && value) {
       try {
-        await addDoc(collection(db, "exercises"), {
+        await addDoc(collection(db, "exerciseBank"), {
           name,
           description,
           type: value,

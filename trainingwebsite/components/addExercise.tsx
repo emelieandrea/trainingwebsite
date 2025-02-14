@@ -25,14 +25,7 @@ import {
   PopoverTrigger,
 } from "../components/ui/popover";
 import NewExercise from "../components/newExercise";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  onSnapshot,
-  updateDoc,
-} from "firebase/firestore";
+import { addDoc, collection, doc, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 interface Props {
@@ -55,7 +48,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "exercises"));
+        const snapshot = await getDocs(collection(db, "exerciseBank"));
         setExercises(
           snapshot.docs.map((doc) => ({
             id: doc.id,

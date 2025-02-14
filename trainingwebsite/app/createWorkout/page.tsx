@@ -47,10 +47,10 @@ export default function CreateWorkout() {
           where("finished", "==", false)
         );
 
-        const snapshot = await getDocs(workoutsQuery);
+        const activeWorkout = await getDocs(workoutsQuery);
 
-        if (!snapshot.empty) {
-          setWorkout(snapshot.docs[0].id);
+        if (!activeWorkout.empty) {
+          setWorkout(activeWorkout.docs[0].id);
         } else {
           console.log("No active workout found, creating new workout");
 
@@ -81,7 +81,6 @@ export default function CreateWorkout() {
           ...doc.data(),
         }));
         setExercises(exercisesData);
-        console.log("Exercises updated:", exercisesData);
       }
     );
     return () => unsubscribe();
@@ -92,7 +91,6 @@ export default function CreateWorkout() {
     if (workout) {
       const workoutDocRef = doc(db, "workouts", workout);
       await updateDoc(workoutDocRef, { finished: true });
-      console.log("Workout updated successfully!");
       setWorkout("");
       router.push("/workouts");
     } else {
