@@ -18,6 +18,9 @@ import { db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import ExerciseCard from "../../components/exerciseCard";
 import { useAuth } from "../../Context/AuthContext";
+import { Save } from "lucide-react";
+import SaveWorkout from "../../components/saveWorkout";
+import { Spinner } from "@heroui/react";
 
 export default function CreateWorkout() {
   const [workout, setWorkout] = useState("");
@@ -73,6 +76,8 @@ export default function CreateWorkout() {
   useEffect(() => {
     if (!workout) return;
 
+    console.log("Setting up exercises listener for workout:", workout);
+
     const unsubscribe = onSnapshot(
       collection(db, "workouts", workout, "exercises"),
       (snapshot) => {
@@ -80,23 +85,12 @@ export default function CreateWorkout() {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log("Received updated exercises:", exercisesData.length);
         setExercises(exercisesData);
       }
     );
     return () => unsubscribe();
-  }, [workout]);
-
-  // Save workout
-  const saveWorkout = async () => {
-    if (workout) {
-      const workoutDocRef = doc(db, "workouts", workout);
-      await updateDoc(workoutDocRef, { finished: true });
-      setWorkout("");
-      router.push("/workouts");
-    } else {
-      console.error("Error updating workout:");
-    }
-  };
+  }, [workout]); // Only re-run when workout changes
 
   return (
     <>
@@ -110,6 +104,7 @@ export default function CreateWorkout() {
             <p className="flex justify-center w-full text-xl font-bold">
               Skapa ett träningspass:
             </p>
+            {!workout && <Spinner className="flex justify-center w-full" />}
             {workout && <AddExercise workout={workout} />}
             <div>
               {exercises.map((exercise) => (
@@ -124,13 +119,7 @@ export default function CreateWorkout() {
                 />
               ))}
             </div>
-            <Button
-              onClick={saveWorkout}
-              size="4"
-              style={{ marginBottom: "70px" }}
-            >
-              Spara träningspass
-            </Button>
+            <SaveWorkout workout={workout} />
           </div>
         </div>
       </SidebarProvider>

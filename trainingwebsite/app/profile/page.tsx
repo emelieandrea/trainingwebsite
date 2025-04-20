@@ -17,9 +17,6 @@ export default function Profile({}: Props) {
             <p className="flex justify-center w-full text-xl font-bold">
               Kul med träning!
             </p>
-            <Button size="4">Mina träningspass</Button>
-            <Button size="4">Mina övningar</Button>
-            <Button size="4">Skapa träningspass</Button>
           </div>
         </div>
       </SidebarProvider>

@@ -45,22 +45,25 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   const [repsInput, setRepsInput] = useState<string[]>([]);
   const [weightsInput, setWeightsInput] = useState<string[]>([]);
 
+  // Move fetchExercises to a named function so it can be reused
+  const fetchExercises = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "exerciseBank"));
+      setExercises(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().name,
+          description: doc.data().description,
+          ...doc.data(),
+        }))
+      );
+      console.log("Updated fetch of exercises");
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "exerciseBank"));
-        setExercises(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            name: doc.data().name,
-            description: doc.data().description,
-            ...doc.data(),
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching exercises:", error);
-      }
-    };
     fetchExercises();
   }, []);
 
@@ -178,7 +181,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <NewExercise />
+              <NewExercise onExerciseAdded={fetchExercises} />
             </Flex>
             <Flex direction="row" gap="3">
               <label>

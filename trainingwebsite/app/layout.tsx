@@ -4,6 +4,7 @@ import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import { AuthProvider } from "../Context/AuthContext";
+import { HeroUIProvider } from "@heroui/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <Theme accentColor="teal" radius="large">
-            {children}
+            <HeroUIProvider>{children}</HeroUIProvider>
           </Theme>
         </AuthProvider>
       </body>

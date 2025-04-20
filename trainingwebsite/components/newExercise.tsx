@@ -12,7 +12,11 @@ import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { CustomButton } from "../components/ui/button";
 
-const NewExercise = () => {
+interface NewExerciseProps {
+  onExerciseAdded?: () => void; // Optional callback function
+}
+
+const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [value, setValue] = useState("");
   const [toolsList, setTools] = useState<{ id: string; name: string }[]>([]);
@@ -50,6 +54,11 @@ const NewExercise = () => {
         console.log("Exercise saved successfully!");
         setErrorMessage("");
         setDialogOpen(false);
+
+        // Call the callback function if provided
+        if (onExerciseAdded) {
+          onExerciseAdded();
+        }
       } catch (error) {
         console.error("Error saving exercise: ", error);
         setErrorMessage("Det gick inte att spara övningen. Försök igen.");
