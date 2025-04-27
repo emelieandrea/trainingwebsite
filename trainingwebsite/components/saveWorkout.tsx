@@ -1,23 +1,9 @@
 "use client";
-import { PlusIcon } from "@radix-ui/react-icons";
-import {
-  Dialog,
-  Flex,
-  IconButton,
-  RadioGroup,
-  TextField,
-} from "@radix-ui/themes";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  updateDoc,
-} from "firebase/firestore";
+
+import { Flex, TextField } from "@radix-ui/themes";
+import React, { useRef, useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { CustomButton } from "../components/ui/button";
-import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@radix-ui/themes";
 import { DatePicker } from "@heroui/date-picker";
@@ -36,6 +22,7 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const nameRef = useRef<HTMLInputElement>(null);
+  const gymRef = useRef<HTMLInputElement>(null);
 
   // Use DateValue instead of Date for selectedDate
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(
@@ -56,8 +43,8 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
           finished: true,
           date: nativeDate.toISOString(),
           name: nameRef.current?.value || "Unnamed Workout",
+          gym: gymRef.current?.value || "Unnamed Gym",
         });
-        //setWorkout("");
         router.push("/workouts");
       } catch (error) {
         console.error("Error updating workout:", error);
@@ -99,6 +86,13 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
             granularity="day"
           />
         </div>
+        <label>
+          <span>Namn på gymmet</span>
+          <TextField.Root
+            ref={gymRef}
+            placeholder="Lägg till vilket gym du tränat på"
+          />
+        </label>
       </Flex>
       {errorMessage && (
         <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>

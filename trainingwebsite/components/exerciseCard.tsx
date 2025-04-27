@@ -1,11 +1,12 @@
-import { Box, Card } from "@radix-ui/themes";
 import React from "react";
+import { Box } from "@radix-ui/themes/components/box";
+import { Text } from "@radix-ui/themes/components/index";
 
 interface Props {
   name: string;
-  set: [{ repetitions: number; weight: number }];
+  set: { repetitions: number; weight: number }[];
   leftright: boolean;
-  level: number;
+  level: string | number; // Updated to accept either string or number
   sameSet: boolean;
   sets: number;
 }
@@ -19,25 +20,28 @@ const ExerciseCard: React.FC<Props> = ({
   sets,
 }) => {
   return (
-    <Box maxWidth="420px" className="my-2">
-      <Card asChild>
-        <div>
-          <h3>{name}</h3>
-          {set.map((s, index) => (
-            <p key={index}>
-              Set {index + 1}: {s.repetitions} repetitioner med {s.weight} kg
-            </p>
-          ))}
-          <p>{leftright ? "Uppdelat i höger och vänster" : ""}</p>
-          <p>
-            {level == 1
-              ? "Borde ta tyngre nästa gång"
-              : level == 2
-              ? "Detta var en bra nivå"
-              : "Lite gränsfall till för tungt"}
-          </p>
-        </div>
-      </Card>
+    <Box className="p-3 border rounded-md">
+      <Text as="p" weight="bold">
+        {name}
+      </Text>
+      {/* Exercise Sets */}
+      <div className="mt-2">
+        {set?.map((set, idx) => (
+          <div key={idx} className="flex gap-4 text-sm">
+            <Text as="p">
+              Set {idx + 1}: {set.repetitions} reps at {set.weight} kg
+            </Text>
+          </div>
+        ))}
+      </div>
+      <Text as="p">
+        Nivå:{" "}
+        {Number(level) === 1
+          ? "Lääätt 🧘"
+          : Number(level) === 2
+          ? "Stark 🏋"
+          : "Tungt.. 🥵"}
+      </Text>
     </Box>
   );
 };

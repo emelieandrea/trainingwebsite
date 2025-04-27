@@ -111,7 +111,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
                 {toolsList.map((type) => (
                   <RadioGroup.Item
                     key={type.id}
-                    value={type.id}
+                    value={type.name}
                     id={type.id}
                     style={{ display: "flex", alignItems: "center" }}
                   >

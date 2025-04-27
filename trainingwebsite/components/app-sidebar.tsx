@@ -29,7 +29,7 @@ const items = [
     icon: Inbox,
   },
   {
-    title: "Mina övningar",
+    title: "Alla övningar",
     url: "/exercises",
     icon: Calendar,
   },
