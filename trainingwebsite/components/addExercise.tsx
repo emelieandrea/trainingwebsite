@@ -248,7 +248,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   style={{ flex: 1, textAlign: "center" }}
                 >
                   <Flex direction="column" width="100%">
-                    1
+                    Lääätt 🧘
                   </Flex>
                 </RadioCards.Item>
                 <RadioCards.Item
@@ -256,7 +256,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   style={{ flex: 1, textAlign: "center" }}
                 >
                   <Flex direction="column" width="100%">
-                    2
+                    Stark 🏋
                   </Flex>
                 </RadioCards.Item>
                 <RadioCards.Item
@@ -264,7 +264,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   style={{ flex: 1, textAlign: "center" }}
                 >
                   <Flex direction="column" width="100%">
-                    3
+                    Tungt.. 🥵
                   </Flex>
                 </RadioCards.Item>
               </RadioCards.Root>

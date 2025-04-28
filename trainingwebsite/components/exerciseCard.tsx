@@ -29,7 +29,8 @@ const ExerciseCard: React.FC<Props> = ({
         {set?.map((set, idx) => (
           <div key={idx} className="flex gap-4 text-sm">
             <Text as="p">
-              Set {idx + 1}: {set.repetitions} reps at {set.weight} kg
+              Set {idx + 1}: {set.repetitions} reps med {set.weight} kg{" "}
+              {leftright ? "på varje sida" : ""}
             </Text>
           </div>
         ))}
