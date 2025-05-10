@@ -14,6 +14,7 @@ interface Props {
   sameSet: boolean;
   sets: number;
   workout: string;
+  active: boolean;
 }
 
 const ExerciseCard: React.FC<Props> = ({
@@ -25,6 +26,7 @@ const ExerciseCard: React.FC<Props> = ({
   sameSet,
   sets,
   workout,
+  active,
 }) => {
   const removeExercise = async () => {
     try {
@@ -59,13 +61,15 @@ const ExerciseCard: React.FC<Props> = ({
           ? "Stark 🏋"
           : "Tungt.. 🥵"}
       </Text>
-      <Button
-        size="sm"
-        className="mt-1 bg-red-500 text-white"
-        onPress={removeExercise}
-      >
-        Ta bort övning
-      </Button>
+      {active ? (
+        <Button
+          size="sm"
+          className="mt-1 bg-red-500 text-white"
+          onPress={removeExercise}
+        >
+          Ta bort övning
+        </Button>
+      ) : null}
     </Box>
   );
 };

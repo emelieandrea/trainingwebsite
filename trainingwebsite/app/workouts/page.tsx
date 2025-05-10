@@ -215,9 +215,9 @@ export default function Workouts({}: Props) {
                         setSelectedWorkout(null);
                       }}
                     />
-                    <Button size="sm" className="mx-2">
+                    {/* <Button size="sm" className="mx-2">
                       Ändra
-                    </Button>
+                    </Button> */}
                     <Text as="p" className="mb-2">
                       Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
                     </Text>
@@ -237,6 +237,7 @@ export default function Workouts({}: Props) {
                             level={exercise.level}
                             sameSet={exercise.sameSet}
                             workout={workoutDetails.workout?.id || ""}
+                            active={false}
                           />
                         ))}
                       </div>

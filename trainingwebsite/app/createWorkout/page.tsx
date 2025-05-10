@@ -118,6 +118,7 @@ export default function CreateWorkout() {
                   level={exercise.level}
                   sameSet={exercise.sameSet}
                   workout={workout}
+                  active={true}
                 />
               ))}
             </div>
