@@ -37,7 +37,10 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   const [checkboxLRChecked, setCheckboxLRChecked] = useState(false);
   const [numSets, setNumSets] = useState(1);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [selectedExercise, setSelectedExercise] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [exercises, setExercises] = useState<
     { id: string; name: string; description: string }[]
   >([]);
@@ -107,8 +110,8 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
 
       try {
         await addDoc(exercisesCollectionRef, {
-          name: value,
-          ref: doc(db, "exercises", value),
+          name: selectedExercise?.name,
+          ref: doc(db, "exercises", selectedExercise?.id || ""),
           sets: numSets,
           sameSet: checkboxChecked,
           leftright: checkboxLRChecked,
@@ -116,7 +119,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
           level: level,
         });
         console.log("Exercise added successfully!");
-        value && setValue("");
+        setSelectedExercise(null);
         setLevel("2");
         console.log("returned states to default");
       } catch (error) {
@@ -129,7 +132,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
 
   return (
     <div>
-      <Box maxWidth="420px">
+      <Box maxWidth="400px">
         <Card>
           <Flex direction="column" gap="3" align="baseline">
             <Flex direction="row" gap="3" align="center">
@@ -141,10 +144,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                     aria-expanded={open}
                     className="w-[330px] justify-between"
                   >
-                    {value
-                      ? exercises.find((exercise) => exercise.name === value)
-                          ?.name
-                      : "Välj övning..."}
+                    {selectedExercise?.name || "Välj övning..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </CustomButton>
                 </PopoverTrigger>
@@ -159,16 +159,26 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                             key={exercise.id}
                             value={exercise.name}
                             onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? "" : currentValue
+                              const selected = exercises.find(
+                                (ex) => ex.name === currentValue
                               );
+
+                              if (selected) {
+                                setSelectedExercise({
+                                  id: selected.id,
+                                  name: currentValue,
+                                }); // Store ID and name in selectedExercise
+                              } else {
+                                setSelectedExercise(null);
+                              }
+
                               setOpen(false);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                value === exercise.id
+                                selectedExercise?.id === exercise.id
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
@@ -181,7 +191,14 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <NewExercise onExerciseAdded={fetchExercises} />
+              <NewExercise
+                onExerciseAdded={(id, name) => {
+                  fetchExercises();
+                  if (id && name) {
+                    setSelectedExercise({ id, name });
+                  }
+                }}
+              />
             </Flex>
             <Flex direction="row" gap="3">
               <label>

@@ -1,18 +1,12 @@
 "use client";
 import { SidebarProvider, SidebarTrigger } from "../../components/ui/sidebar";
 import { AppSidebar } from "../../components/app-sidebar";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  Image,
-} from "@heroui/react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query } from "firebase/firestore";
 import { db } from "../../firebase";
+import { Button } from "@heroui/react";
+import DeleteExercise from "../../components/deleteExercise";
 
 type Exercises = {
   id: string;
@@ -27,27 +21,36 @@ export default function Exercises({}: Props) {
   const { user, loading } = useAuth();
   const [exercises, setExercises] = useState<Exercises[]>([]);
 
+  const fetchWorkout = async () => {
+    try {
+      const exerciseQuery = query(collection(db, "exerciseBank"));
+
+      const allExercises: Exercises[] = [];
+      const exercises = await getDocs(exerciseQuery);
+
+      exercises.forEach((doc) => {
+        allExercises.push({ id: doc.id, ...doc.data() } as Exercises);
+      });
+
+      setExercises(allExercises);
+      console.log("Fetched workouts:", allExercises);
+    } catch (error) {
+      console.error("Error fetching workout:", error);
+    }
+  };
+
+  const removeExercise = async (id: any) => {
+    try {
+      await deleteDoc(doc(db, "exerciseBank", id));
+      console.log("Exercise removed successfully");
+      fetchWorkout();
+    } catch (error) {
+      console.error("Error removing exercise:", error);
+    }
+  };
+
   useEffect(() => {
     if (!user || loading) return;
-
-    const fetchWorkout = async () => {
-      try {
-        const exerciseQuery = query(collection(db, "exerciseBank"));
-
-        const allExercises: Exercises[] = [];
-        const exercises = await getDocs(exerciseQuery);
-
-        exercises.forEach((doc) => {
-          allExercises.push({ id: doc.id, ...doc.data() } as Exercises);
-        });
-
-        setExercises(allExercises);
-        console.log("Fetched workouts:", allExercises);
-      } catch (error) {
-        console.error("Error fetching workout:", error);
-      }
-    };
-
     fetchWorkout();
   }, [user, loading]);
 
@@ -59,35 +62,23 @@ export default function Exercises({}: Props) {
           <div className="ml-2 mt-2">
             <SidebarTrigger />
           </div>
-          <div className="grid grid-flow-row justify-center gap-y-5 mt-10 w-full">
+          <div className="grid grid-flow-row justify-center gap-y-5 mt-10 w-full mb-10">
             {exercises.map((exercise) => (
-              <Card key={exercise.id} className="max-w-[400px]">
-                <CardHeader className="flex gap-3">
-                  <Image
-                    alt="heroui logo"
-                    height={40}
-                    radius="sm"
-                    src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                    width={40}
+              <div
+                key={exercise.id}
+                className="w-4/5 border rounded-md flex justify-between items-center p-3 mx-8"
+              >
+                <div className="w-2/3">
+                  <p className="text-xl font-bold text-left">{exercise.name}</p>
+                  <p className="text-sm text-left">{exercise.description}</p>
+                </div>
+                <div className="w-1/3 justify-end flex gap-2">
+                  <DeleteExercise
+                    exerciseId={exercise.id}
+                    onDelete={fetchWorkout}
                   />
-                  <div className="flex flex-col">
-                    <p className="text-md">{exercise.name}</p>
-                    <p className="text-small text-default-500">
-                      {exercise.type}
-                    </p>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p>{exercise.description}</p>
-                </CardBody>
-                <Divider />
-                <CardFooter>
-                  <p className="text-small text-default-500">
-                    Senast du gjorde denna övningar var....
-                  </p>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>

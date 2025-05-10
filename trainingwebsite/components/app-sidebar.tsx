@@ -67,7 +67,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Saving my workouts</SidebarGroupLabel>
+          <SidebarGroupLabel>Spara träningspass</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

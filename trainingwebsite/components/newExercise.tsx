@@ -13,7 +13,7 @@ import { db } from "../firebase";
 import { CustomButton } from "../components/ui/button";
 
 interface NewExerciseProps {
-  onExerciseAdded?: () => void; // Optional callback function
+  onExerciseAdded?: (id?: string, name?: string) => void;
 }
 
 const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
@@ -46,7 +46,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
 
     if (name && description && value) {
       try {
-        await addDoc(collection(db, "exerciseBank"), {
+        const docRef = await addDoc(collection(db, "exerciseBank"), {
           name,
           description,
           type: value,
@@ -57,7 +57,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
 
         // Call the callback function if provided
         if (onExerciseAdded) {
-          onExerciseAdded();
+          onExerciseAdded(docRef.id, name); // Pass both ID and name
         }
       } catch (error) {
         console.error("Error saving exercise: ", error);

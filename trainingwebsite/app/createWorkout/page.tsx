@@ -110,12 +110,14 @@ export default function CreateWorkout() {
               {exercises.map((exercise) => (
                 <ExerciseCard
                   key={exercise.id}
+                  id={exercise.id}
                   name={exercise.name}
                   sets={exercise.sets}
                   set={exercise.set}
                   leftright={exercise.leftright}
                   level={exercise.level}
                   sameSet={exercise.sameSet}
+                  workout={workout}
                 />
               ))}
             </div>

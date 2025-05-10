@@ -9,7 +9,7 @@ import {
   Text,
   Heading,
 } from "@radix-ui/themes/components/index";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   collection,
   doc,
@@ -23,6 +23,8 @@ import { useAuth } from "../../Context/AuthContext";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import ExerciseCard from "../../components/exerciseCard";
+import { Button } from "@heroui/react";
+import DeleteWorkout from "../../components/deleteWorkout";
 
 type Workout = {
   id: string;
@@ -58,41 +60,41 @@ export default function Workouts({}: Props) {
   });
   const router = useRouter();
 
+  const fetchWorkout = useCallback(async () => {
+    try {
+      const workoutsQuery = query(
+        collection(db, "workouts"),
+        where("owner", "==", user?.uid)
+      );
+
+      const myWorkouts: Workout[] = [];
+      const allWorkouts = await getDocs(workoutsQuery);
+
+      allWorkouts.forEach((doc) => {
+        myWorkouts.push({ id: doc.id, ...doc.data() } as Workout);
+      });
+
+      // Sort workouts by date, newest first
+      const sortedWorkouts = myWorkouts.sort((a, b) => {
+        // Handle missing dates by treating them as oldest
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        // Compare dates in descending order (newest first)
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+
+      setWorkouts(sortedWorkouts);
+      console.log("Fetched workouts:", sortedWorkouts);
+    } catch (error) {
+      console.error("Error fetching workout:", error);
+    }
+  }, [user?.uid]);
+
   useEffect(() => {
     if (!user || loading) return;
 
-    const fetchWorkout = async () => {
-      try {
-        const workoutsQuery = query(
-          collection(db, "workouts"),
-          where("owner", "==", user.uid)
-        );
-
-        const myWorkouts: Workout[] = [];
-        const allWorkouts = await getDocs(workoutsQuery);
-
-        allWorkouts.forEach((doc) => {
-          myWorkouts.push({ id: doc.id, ...doc.data() } as Workout);
-        });
-
-        // Sort workouts by date, newest first
-        const sortedWorkouts = myWorkouts.sort((a, b) => {
-          // Handle missing dates by treating them as oldest
-          if (!a.date) return 1;
-          if (!b.date) return -1;
-          // Compare dates in descending order (newest first)
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-
-        setWorkouts(sortedWorkouts);
-        console.log("Fetched workouts:", sortedWorkouts);
-      } catch (error) {
-        console.error("Error fetching workout:", error);
-      }
-    };
-
     fetchWorkout();
-  }, [user, loading]);
+  }, [user, loading, fetchWorkout]);
 
   const handleWorkoutSelect = async (workoutId: string) => {
     setSelectedWorkout(workoutId);
@@ -206,6 +208,16 @@ export default function Workouts({}: Props) {
                     <Heading size="6" className="mb-2">
                       {workoutDetails.workout.name || "Unnamed Workout"}
                     </Heading>
+                    <DeleteWorkout
+                      workoutId={workoutDetails.workout.id}
+                      onDelete={() => {
+                        fetchWorkout();
+                        setSelectedWorkout(null);
+                      }}
+                    />
+                    <Button size="sm" className="mx-2">
+                      Ändra
+                    </Button>
                     <Text as="p" className="mb-2">
                       Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
                     </Text>
@@ -217,12 +229,14 @@ export default function Workouts({}: Props) {
                         {workoutDetails.exercises.map((exercise) => (
                           <ExerciseCard
                             key={exercise.id}
+                            id={exercise.id}
                             name={exercise.name}
                             sets={exercise.sets}
                             set={exercise.set}
                             leftright={exercise.leftright}
                             level={exercise.level}
                             sameSet={exercise.sameSet}
+                            workout={workoutDetails.workout?.id || ""}
                           />
                         ))}
                       </div>
