@@ -131,33 +131,42 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   };
 
   return (
-    <div>
-      <Box maxWidth="400px">
-        <Card>
-          <Flex direction="column" gap="3" align="baseline">
-            <Flex direction="row" gap="3" align="center">
+    <div className="w-full px-4 sm:px-0">
+      <Box className="max-w-full sm:max-w-md mx-auto">
+        <Card className="shadow-sm">
+          <Flex
+            direction="column"
+            gap="4"
+            align="baseline"
+            className="p-2 sm:p-4"
+          >
+            <Flex direction="row" gap="3" align="center" className="w-full">
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <CustomButton
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-[330px] justify-between"
+                    className="w-full sm:w-[330px] justify-between py-2 px-3 text-base"
                   >
                     {selectedExercise?.name || "Välj övning..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronsUpDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
                   </CustomButton>
                 </PopoverTrigger>
-                <PopoverContent className="w-[330px] p-0">
+                <PopoverContent className="w-[90vw] sm:w-[330px] p-0 max-h-[60vh] overflow-auto">
                   <Command>
-                    <CommandInput placeholder="Sök övning..." />
-                    <CommandList>
+                    <CommandInput
+                      placeholder="Sök övning..."
+                      className="py-3"
+                    />
+                    <CommandList className="max-h-[50vh]">
                       <CommandEmpty>Ingen övning hittad.</CommandEmpty>
                       <CommandGroup>
                         {exercises.map((exercise) => (
                           <CommandItem
                             key={exercise.id}
                             value={exercise.name}
+                            className="py-3 px-3"
                             onSelect={(currentValue) => {
                               const selected = exercises.find(
                                 (ex) => ex.name === currentValue
@@ -200,69 +209,93 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                 }}
               />
             </Flex>
-            <Flex direction="row" gap="3">
-              <label>
+            <Flex direction="column" gap="4" className="w-full">
+              <div className="w-full">
+                <label className="block mb-1 text-sm font-medium">
+                  Antal set för övningen
+                </label>
                 <TextField.Root
-                  placeholder="Antal set för övningen"
-                  style={{ minWidth: "150px" }}
+                  placeholder="Antal set"
+                  className="w-full sm:w-auto"
                   onChange={handleSetChange}
                 />
-              </label>
-              <Flex gap="2" align="center">
-                <Checkbox
-                  defaultChecked={checkboxChecked}
-                  onClick={handleCheckboxClick}
-                />
-                <a>Samma vikt/antal per set</a>
-              </Flex>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <Flex
+                  gap="2"
+                  align="center"
+                  className="touch-manipulation py-1"
+                >
+                  <Checkbox
+                    defaultChecked={checkboxChecked}
+                    onClick={handleCheckboxClick}
+                    className="h-5 w-5"
+                  />
+                  <span className="text-sm">Samma vikt/antal per set</span>
+                </Flex>
+
+                <Flex
+                  gap="2"
+                  align="center"
+                  className="touch-manipulation py-1"
+                >
+                  <Checkbox
+                    defaultChecked={checkboxLRChecked}
+                    onClick={handleCheckboxLRClick}
+                    className="h-5 w-5"
+                  />
+                  <span className="text-sm">Dela upp i höger och vänster</span>
+                </Flex>
+              </div>
             </Flex>
-            <Flex gap="2" align="center">
-              <Checkbox
-                defaultChecked={checkboxLRChecked}
-                onClick={handleCheckboxLRClick}
-              />
-              <a>Dela upp i höger och vänster</a>
-            </Flex>
+
             {Array.from({ length: renderedFields }).map((_, index) => (
-              <Flex direction="row" align="center" gap="3" key={index}>
-                <label>
-                  {index === 0 && "Vikt/set (kg)"}
-                  {index === 0 && checkboxLRChecked && "/sida"}
-                  <TextField.Root
-                    placeholder="Vikt (kg)"
-                    style={{ minWidth: "150px" }}
-                    onChange={(e) =>
-                      handleInputChange(index, "weight", e.target.value)
-                    }
-                  />
-                </label>
-                <label>
-                  {index === 0 && "Repetitioner/set"}
-                  {index === 0 && checkboxLRChecked && "/sida"}
-                  <TextField.Root
-                    placeholder="Antal repetitioner"
-                    style={{ minWidth: "200px" }}
-                    onChange={(e) =>
-                      handleInputChange(index, "reps", e.target.value)
-                    }
-                  />
-                </label>
+              <Flex direction="column" gap="3" key={index} className="w-full">
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <label className="flex-1">
+                    <span className="block mb-1 text-sm font-medium">
+                      {index === 0 && "Vikt/set (kg)"}
+                      {index === 0 && checkboxLRChecked && "/sida"}
+                    </span>
+                    <TextField.Root
+                      placeholder="Vikt (kg)"
+                      className="w-full"
+                      onChange={(e) =>
+                        handleInputChange(index, "weight", e.target.value)
+                      }
+                    />
+                  </label>
+                  <label className="flex-1">
+                    <span className="block mb-1 text-sm font-medium">
+                      {index === 0 && "Repetitioner/set"}
+                      {index === 0 && checkboxLRChecked && "/sida"}
+                    </span>
+                    <TextField.Root
+                      placeholder="Antal repetitioner"
+                      className="w-full"
+                      onChange={(e) =>
+                        handleInputChange(index, "reps", e.target.value)
+                      }
+                    />
+                  </label>
+                </div>
               </Flex>
             ))}
-            <Box className="w-full">
+            <Box className="w-full mt-3">
+              <label className="block mb-2 text-sm font-medium">
+                Svårighetsgrad
+              </label>
               <RadioCards.Root
                 defaultValue="2"
                 size="1"
-                style={{
-                  display: "flex",
-                  width: "100%",
-                }}
+                className="flex flex-row w-full touch-manipulation"
                 value={level}
                 onValueChange={setLevel}
               >
                 <RadioCards.Item
                   value="1"
-                  style={{ flex: 1, textAlign: "center" }}
+                  className="flex-1 text-center py-3 touch-manipulation"
                 >
                   <Flex direction="column" width="100%">
                     Lääätt 🧘
@@ -270,7 +303,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                 </RadioCards.Item>
                 <RadioCards.Item
                   value="2"
-                  style={{ flex: 1, textAlign: "center" }}
+                  className="flex-1 text-center py-3 touch-manipulation"
                 >
                   <Flex direction="column" width="100%">
                     Stark 🏋
@@ -278,7 +311,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                 </RadioCards.Item>
                 <RadioCards.Item
                   value="3"
-                  style={{ flex: 1, textAlign: "center" }}
+                  className="flex-1 text-center py-3 touch-manipulation"
                 >
                   <Flex direction="column" width="100%">
                     Tungt.. 🥵
@@ -286,8 +319,11 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                 </RadioCards.Item>
               </RadioCards.Root>
             </Box>
-            <Flex gap="3" mt="4" justify="end">
-              <CustomButton onClick={saveExercise}>
+            <Flex gap="3" mt="5" justify="center" className="w-full">
+              <CustomButton
+                onClick={saveExercise}
+                className="py-3 px-4 w-full sm:w-auto text-base rounded-md touch-manipulation"
+              >
                 Lägg till övning
               </CustomButton>
             </Flex>

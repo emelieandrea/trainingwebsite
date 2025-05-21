@@ -100,29 +100,40 @@ export default function CreateWorkout() {
           <div className="ml-2 mt-2">
             <SidebarTrigger />
           </div>
-          <div className="grid grid-flow-row justify-center gap-y-5 mt-10 w-full">
-            <p className="flex justify-center w-full text-xl font-bold">
-              Skapa ett träningspass:
-            </p>
+          <div className="grid grid-flow-row justify-center gap-y-6 mt-6 w-full px-4 md:px-0 max-w-screen-xl mx-auto">
+            <h1 className="flex justify-center w-full text-xl md:text-2xl font-bold">
+              Skapa ett träningspass
+            </h1>
             {!workout && <Spinner className="flex justify-center w-full" />}
             {workout && <AddExercise workout={workout} />}
-            <div>
-              {exercises.map((exercise) => (
-                <ExerciseCard
-                  key={exercise.id}
-                  id={exercise.id}
-                  name={exercise.name}
-                  sets={exercise.sets}
-                  set={exercise.set}
-                  leftright={exercise.leftright}
-                  level={exercise.level}
-                  sameSet={exercise.sameSet}
-                  workout={workout}
-                  active={true}
-                />
-              ))}
+
+            {exercises.length > 0 && (
+              <div className="mt-3 mb-6">
+                <h2 className="text-lg font-semibold mb-4">
+                  Tillagda övningar
+                </h2>
+                <div className="space-y-4">
+                  {exercises.map((exercise) => (
+                    <ExerciseCard
+                      key={exercise.id}
+                      id={exercise.id}
+                      name={exercise.name}
+                      sets={exercise.sets}
+                      set={exercise.set}
+                      leftright={exercise.leftright}
+                      level={exercise.level}
+                      sameSet={exercise.sameSet}
+                      workout={workout}
+                      active={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mb-20">
+              <SaveWorkout workout={workout} />
             </div>
-            <SaveWorkout workout={workout} />
           </div>
         </div>
       </SidebarProvider>

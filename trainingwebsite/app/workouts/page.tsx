@@ -156,34 +156,30 @@ export default function Workouts({}: Props) {
             <SidebarTrigger />
           </div>
 
-          <div className="p-4">
+          <div className="p-4 max-w-screen-xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Mina träningspass</h1>
 
             <div className="flex flex-col md:flex-row gap-4 max-w-full">
               {/* Left Column - Workout List */}
-              <div className="w-full md:w-1/2">
-                <Box maxWidth="100%">
+              <div className="w-full md:w-1/2 order-2 md:order-1">
+                <Box maxWidth="100%" className="sticky top-4">
                   {workouts.length > 0 ? (
                     <RadioCards.Root
                       value={selectedWorkout || undefined}
                       onValueChange={handleWorkoutSelect}
-                      className="[&_[role=radio]]:py-1 [&_[role=radio]]:min-h-0"
+                      className="[&_[role=radio]]:py-2 [&_[role=radio]]:min-h-0 touch-manipulation"
                     >
                       {workouts.map((workout) => (
                         <RadioCards.Item
                           key={workout.id}
                           value={workout.id}
-                          className="py-1"
+                          className="py-2 mb-2 touch-action-manipulation"
                         >
-                          <Flex
-                            direction="column"
-                            width="100%"
-                            className="p-0.5"
-                          >
-                            <p className="font-bold text-sm">
+                          <Flex direction="column" width="100%" className="p-1">
+                            <p className="font-bold text-base">
                               {workout.name || "Inget namn"}
                             </p>
-                            <div className="flex justify-between text-xs">
+                            <div className="flex justify-between text-sm mt-1">
                               <p>{formatDate(workout.date)}</p>
                               <p>
                                 {workout.finished ? "Avslutad" : "Pågående"}
@@ -194,7 +190,7 @@ export default function Workouts({}: Props) {
                       ))}
                     </RadioCards.Root>
                   ) : (
-                    <p className="text-center p-4">
+                    <p className="text-center p-6 text-base">
                       Hittar inga träningspass. Skapa ditt första träningspass!
                     </p>
                   )}
@@ -202,30 +198,29 @@ export default function Workouts({}: Props) {
               </div>
 
               {/* Right Column - Workout Details */}
-              <div className="w-full md:w-1/2 mt-4 md:mt-0">
+              <div className="w-full md:w-1/2 mt-0 md:mt-0 order-1 md:order-2 mb-6 md:mb-0">
                 {selectedWorkout && workoutDetails.workout ? (
-                  <Card className="p-4">
-                    <Heading size="6" className="mb-2">
+                  <Card className="p-4 shadow-sm rounded-lg">
+                    <Heading size="6" className="mb-3">
                       {workoutDetails.workout.name || "Unnamed Workout"}
                     </Heading>
-                    <DeleteWorkout
-                      workoutId={workoutDetails.workout.id}
-                      onDelete={() => {
-                        fetchWorkout();
-                        setSelectedWorkout(null);
-                      }}
-                    />
-                    {/* <Button size="sm" className="mx-2">
-                      Ändra
-                    </Button> */}
-                    <Text as="p" className="mb-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
+                      <DeleteWorkout
+                        workoutId={workoutDetails.workout.id}
+                        onDelete={() => {
+                          fetchWorkout();
+                          setSelectedWorkout(null);
+                        }}
+                      />
+                    </div>
+                    <Text as="p" className="mb-3 text-base">
                       Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
                     </Text>
-                    <Heading size="5" className="mb-3">
+                    <Heading size="5" className="mb-4">
                       Övningar
                     </Heading>
                     {workoutDetails.exercises.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-5">
                         {workoutDetails.exercises.map((exercise) => (
                           <ExerciseCard
                             key={exercise.id}
@@ -242,14 +237,14 @@ export default function Workouts({}: Props) {
                         ))}
                       </div>
                     ) : (
-                      <Text as="p">
+                      <Text as="p" className="p-4 text-center">
                         Inga övningar hittade för detta träningspass.
                       </Text>
                     )}
                   </Card>
                 ) : (
-                  <div className="h-full flex items-center justify-center border border-dashed rounded-md p-8">
-                    <Text as="p" color="gray">
+                  <div className="h-full flex items-center justify-center border border-dashed rounded-md p-8 bg-gray-50">
+                    <Text as="p" color="gray" className="text-center text-base">
                       Välj ett träningspass för att se detaljer.
                     </Text>
                   </div>

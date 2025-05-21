@@ -63,45 +63,55 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
   };
 
   return (
-    <div>
-      <Flex direction="column" gap="3">
-        <label>
-          <span>Namn på träningspasset</span>
-          <TextField.Root
-            ref={nameRef}
-            placeholder="Lägg till träningspassets namn"
-          />
-        </label>
-        <div
-          className="flex w-full flex-wrap md:flex-nowrap gap-4"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <DatePicker
-            isRequired
-            className="w-fill"
-            label="Datum"
-            value={selectedDate}
-            onChange={handleDateChange}
-            isReadOnly={false}
-            granularity="day"
-          />
-        </div>
-        <label>
-          <span>Namn på gymmet</span>
-          <TextField.Root
-            ref={gymRef}
-            placeholder="Lägg till vilket gym du tränat på"
-          />
-        </label>
-      </Flex>
-      {errorMessage && (
-        <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
-      )}
-      <Flex gap="3" mt="4" justify="center">
-        <Button size="4" style={{ marginBottom: "70px" }} onClick={saveWorkout}>
-          Spara träningspass
-        </Button>
-      </Flex>
+    <div className="w-full px-4 sm:px-0 max-w-md mx-auto">
+      <div className="bg-white p-5 rounded-lg shadow-sm border">
+        <h2 className="text-lg font-semibold mb-4">Spara träningspass</h2>
+        <Flex direction="column" gap="4">
+          <label>
+            <span className="block mb-1 text-sm font-medium">
+              Namn på träningspasset
+            </span>
+            <TextField.Root
+              ref={nameRef}
+              placeholder="Lägg till träningspassets namn"
+              className="w-full"
+            />
+          </label>
+          <div className="w-full" onClick={(e) => e.stopPropagation()}>
+            <span className="block mb-1 text-sm font-medium">Datum</span>
+            <DatePicker
+              isRequired
+              className="w-full touch-manipulation"
+              value={selectedDate}
+              onChange={handleDateChange}
+              isReadOnly={false}
+              granularity="day"
+            />
+          </div>
+          <label>
+            <span className="block mb-1 text-sm font-medium">
+              Namn på gymmet
+            </span>
+            <TextField.Root
+              ref={gymRef}
+              placeholder="Lägg till vilket gym du tränat på"
+              className="w-full"
+            />
+          </label>
+        </Flex>
+        {errorMessage && (
+          <p className="text-red-500 mt-3 text-sm">{errorMessage}</p>
+        )}
+        <Flex gap="3" mt="5" justify="center">
+          <Button
+            size="4"
+            onClick={saveWorkout}
+            className="w-full py-3 touch-manipulation"
+          >
+            Spara träningspass
+          </Button>
+        </Flex>
+      </div>
     </div>
   );
 };

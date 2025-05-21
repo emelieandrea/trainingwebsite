@@ -38,22 +38,22 @@ const ExerciseCard: React.FC<Props> = ({
   };
 
   return (
-    <Box className="p-3 border rounded-md">
-      <Text as="p" weight="bold">
+    <Box className="p-3 border rounded-md shadow-sm">
+      <Text as="p" weight="bold" className="text-lg md:text-base">
         {name}
       </Text>
       {/* Exercise Sets */}
       <div className="mt-2">
         {set?.map((set, idx) => (
-          <div key={idx} className="flex gap-4 text-sm">
-            <Text as="p">
+          <div key={idx} className="flex flex-wrap gap-2 md:gap-4 text-sm mb-1">
+            <Text as="p" className="leading-snug">
               Set {idx + 1}: {set.repetitions} reps med {set.weight} kg{" "}
               {leftright ? "på varje sida" : ""}
             </Text>
           </div>
         ))}
       </div>
-      <Text as="p">
+      <Text as="p" className="my-2">
         Nivå:{" "}
         {Number(level) === 1
           ? "Lääätt 🧘"
@@ -64,7 +64,7 @@ const ExerciseCard: React.FC<Props> = ({
       {active ? (
         <Button
           size="sm"
-          className="mt-1 bg-red-500 text-white"
+          className="mt-2 bg-red-500 text-white w-full md:w-auto py-2 px-4 rounded-md touch-manipulation"
           onPress={removeExercise}
         >
           Ta bort övning
