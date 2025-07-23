@@ -34,12 +34,8 @@ const DeleteWorkout: React.FC<Props> = ({ workoutId, onDelete }) => {
 
   return (
     <>
-      <Button
-        size="sm"
-        className="mx-2 bg-red-500 text-white py-2 px-4 rounded-md touch-manipulation"
-        onPress={onOpen}
-      >
-        Ta bort
+      <Button size="sm" className="mx-2 bg-red-500 text-white" onPress={onOpen}>
+        Ta bort träningspass
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>

@@ -23,8 +23,9 @@ import { useAuth } from "../../Context/AuthContext";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import ExerciseCard from "../../components/exerciseCard";
-import { Button } from "@heroui/react";
 import DeleteWorkout from "../../components/deleteWorkout";
+import { useIsMobile } from "../../hooks/use-mobile";
+import EditWorkout from "../../components/editWorkout";
 
 type Workout = {
   id: string;
@@ -49,6 +50,7 @@ type Props = {};
 
 export default function Workouts({}: Props) {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
   const [workoutDetails, setWorkoutDetails] = useState<{
@@ -158,99 +160,225 @@ export default function Workouts({}: Props) {
 
           <div className="p-4 max-w-screen-xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Mina träningspass</h1>
-
-            <div className="flex flex-col md:flex-row gap-4 max-w-full">
-              {/* Left Column - Workout List */}
-              <div className="w-full md:w-1/2 order-2 md:order-1">
-                <Box maxWidth="100%" className="sticky top-4">
-                  {workouts.length > 0 ? (
-                    <RadioCards.Root
-                      value={selectedWorkout || undefined}
-                      onValueChange={handleWorkoutSelect}
-                      className="[&_[role=radio]]:py-2 [&_[role=radio]]:min-h-0 touch-manipulation"
-                    >
-                      {workouts.map((workout) => (
-                        <RadioCards.Item
-                          key={workout.id}
-                          value={workout.id}
-                          className="py-2 mb-2 touch-action-manipulation"
-                        >
-                          <Flex direction="column" width="100%" className="p-1">
-                            <p className="font-bold text-base">
-                              {workout.name || "Inget namn"}
-                            </p>
-                            <div className="flex justify-between text-sm mt-1">
-                              <p>{formatDate(workout.date)}</p>
-                              <p>
-                                {workout.finished ? "Avslutad" : "Pågående"}
+            {isMobile ? (
+              <div className="flex flex-col md:flex-row gap-4 max-w-full">
+                {/* Left Column - Workout List */}
+                <div className="w-full md:w-1/2 order-1 md:order-1">
+                  <Box maxWidth="100%" className="sticky top-4">
+                    {workouts.length > 0 ? (
+                      <RadioCards.Root
+                        value={selectedWorkout || undefined}
+                        onValueChange={handleWorkoutSelect}
+                        className="[&_[role=radio]]:py-2 [&_[role=radio]]:min-h-0 touch-manipulation"
+                      >
+                        {workouts.map((workout) => (
+                          <RadioCards.Item
+                            key={workout.id}
+                            value={workout.id}
+                            className="py-2 mb-2 touch-action-manipulation w-full"
+                          >
+                            <Flex
+                              direction="column"
+                              width="100%"
+                              className="p-1"
+                            >
+                              <p className="font-bold text-base">
+                                {workout.name || "Inget namn"}
                               </p>
-                            </div>
-                          </Flex>
-                        </RadioCards.Item>
-                      ))}
-                    </RadioCards.Root>
-                  ) : (
-                    <p className="text-center p-6 text-base">
-                      Hittar inga träningspass. Skapa ditt första träningspass!
-                    </p>
-                  )}
-                </Box>
-              </div>
-
-              {/* Right Column - Workout Details */}
-              <div className="w-full md:w-1/2 mt-0 md:mt-0 order-1 md:order-2 mb-6 md:mb-0">
-                {selectedWorkout && workoutDetails.workout ? (
-                  <Card className="p-4 shadow-sm rounded-lg">
-                    <Heading size="6" className="mb-3">
-                      {workoutDetails.workout.name || "Unnamed Workout"}
-                    </Heading>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
-                      <DeleteWorkout
-                        workoutId={workoutDetails.workout.id}
-                        onDelete={() => {
-                          fetchWorkout();
-                          setSelectedWorkout(null);
-                        }}
-                      />
-                    </div>
-                    <Text as="p" className="mb-3 text-base">
-                      Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
-                    </Text>
-                    <Heading size="5" className="mb-4">
-                      Övningar
-                    </Heading>
-                    {workoutDetails.exercises.length > 0 ? (
-                      <div className="space-y-5">
-                        {workoutDetails.exercises.map((exercise) => (
-                          <ExerciseCard
-                            key={exercise.id}
-                            id={exercise.id}
-                            name={exercise.name}
-                            sets={exercise.sets}
-                            set={exercise.set}
-                            leftright={exercise.leftright}
-                            level={exercise.level}
-                            sameSet={exercise.sameSet}
-                            workout={workoutDetails.workout?.id || ""}
-                            active={false}
-                          />
+                              <div className="flex justify-between text-sm mt-1">
+                                <p>{formatDate(workout.date)}</p>
+                                <p>
+                                  {workout.finished ? "Avslutad" : "Pågående"}
+                                </p>
+                              </div>
+                            </Flex>
+                          </RadioCards.Item>
                         ))}
-                      </div>
+                      </RadioCards.Root>
                     ) : (
-                      <Text as="p" className="p-4 text-center">
-                        Inga övningar hittade för detta träningspass.
-                      </Text>
+                      <p className="text-center p-6 text-base">
+                        Hittar inga träningspass. Skapa ditt första
+                        träningspass!
+                      </p>
                     )}
-                  </Card>
-                ) : (
-                  <div className="h-full flex items-center justify-center border border-dashed rounded-md p-8 bg-gray-50">
-                    <Text as="p" color="gray" className="text-center text-base">
-                      Välj ett träningspass för att se detaljer.
-                    </Text>
-                  </div>
-                )}
+                  </Box>
+                </div>
+
+                {/* Right Column - Workout Details */}
+                <div className="w-full md:w-1/2 mt-0 md:mt-0 order-1 md:order-2 mb-6 md:mb-0">
+                  {selectedWorkout && workoutDetails.workout ? (
+                    <Card className="p-4 shadow-sm rounded-lg">
+                      <Heading size="6" className="mb-3">
+                        {workoutDetails.workout.name || "Unnamed Workout"}
+                      </Heading>
+                      <div className="flex flex-row sm:flex-row items-start sm:items-center gap-2 mb-4">
+                        <DeleteWorkout
+                          workoutId={workoutDetails.workout.id}
+                          onDelete={() => {
+                            fetchWorkout();
+                            setSelectedWorkout(null);
+                          }}
+                        />
+                        <EditWorkout
+                          workoutId={workoutDetails.workout.id}
+                          onEdit={() => {
+                            fetchWorkout();
+                            setSelectedWorkout(null);
+                          }}
+                        />
+                      </div>
+                      <Text as="p" className="mb-3 text-base">
+                        Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
+                      </Text>
+                      <Heading size="5" className="mb-4">
+                        Övningar
+                      </Heading>
+                      {workoutDetails.exercises.length > 0 ? (
+                        <div className="space-y-5">
+                          {workoutDetails.exercises.map((exercise) => (
+                            <ExerciseCard
+                              key={exercise.id}
+                              id={exercise.id}
+                              name={exercise.name}
+                              sets={exercise.sets}
+                              set={exercise.set}
+                              leftright={exercise.leftright}
+                              level={exercise.level}
+                              sameSet={exercise.sameSet}
+                              workout={workoutDetails.workout?.id || ""}
+                              active={false}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <Text as="p" className="p-4 text-center">
+                          Inga övningar hittade för detta träningspass.
+                        </Text>
+                      )}
+                    </Card>
+                  ) : (
+                    <div className="h-full flex items-center justify-center border border-dashed rounded-md p-8 bg-gray-50">
+                      <Text
+                        as="p"
+                        color="gray"
+                        className="text-center text-base"
+                      >
+                        Välj ett träningspass för att se detaljer.
+                      </Text>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col md:flex-row gap-4 max-w-full">
+                {/* Left Column - Workout List */}
+                <div className="w-full md:w-1/2 order-1 md:order-1">
+                  <Box maxWidth="100%" className="sticky top-4">
+                    {workouts.length > 0 ? (
+                      <RadioCards.Root
+                        value={selectedWorkout || undefined}
+                        onValueChange={handleWorkoutSelect}
+                        className="[&_[role=radio]]:py-2 [&_[role=radio]]:min-h-0 touch-manipulation"
+                      >
+                        {workouts.map((workout) => (
+                          <RadioCards.Item
+                            key={workout.id}
+                            value={workout.id}
+                            className="py-2 mb-2 touch-action-manipulation w-full"
+                          >
+                            <Flex
+                              direction="column"
+                              width="100%"
+                              className="p-1"
+                            >
+                              <p className="font-bold text-base">
+                                {workout.name || "Inget namn"}
+                              </p>
+                              <div className="flex justify-between text-sm mt-1">
+                                <p>{formatDate(workout.date)}</p>
+                                <p>
+                                  {workout.finished ? "Avslutad" : "Pågående"}
+                                </p>
+                              </div>
+                            </Flex>
+                          </RadioCards.Item>
+                        ))}
+                      </RadioCards.Root>
+                    ) : (
+                      <p className="text-center p-6 text-base">
+                        Hittar inga träningspass. Skapa ditt första
+                        träningspass!
+                      </p>
+                    )}
+                  </Box>
+                </div>
+
+                {/* Right Column - Workout Details */}
+                <div className="w-full md:w-1/2 mt-0 md:mt-0 order-1 md:order-2 mb-6 md:mb-0">
+                  {selectedWorkout && workoutDetails.workout ? (
+                    <Card className="p-4 shadow-sm rounded-lg">
+                      <Heading size="6" className="mb-3">
+                        {workoutDetails.workout.name || "Unnamed Workout"}
+                      </Heading>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
+                        <DeleteWorkout
+                          workoutId={workoutDetails.workout.id}
+                          onDelete={() => {
+                            fetchWorkout();
+                            setSelectedWorkout(null);
+                          }}
+                        />
+                        <EditWorkout
+                          workoutId={workoutDetails.workout.id}
+                          onEdit={() => {
+                            fetchWorkout();
+                            setSelectedWorkout(null);
+                          }}
+                        />
+                      </div>
+                      <Text as="p" className="mb-3 text-base">
+                        Gym: {workoutDetails.workout.gym || "Inget gym angivet"}
+                      </Text>
+                      <Heading size="5" className="mb-4">
+                        Övningar
+                      </Heading>
+                      {workoutDetails.exercises.length > 0 ? (
+                        <div className="space-y-5">
+                          {workoutDetails.exercises.map((exercise) => (
+                            <ExerciseCard
+                              key={exercise.id}
+                              id={exercise.id}
+                              name={exercise.name}
+                              sets={exercise.sets}
+                              set={exercise.set}
+                              leftright={exercise.leftright}
+                              level={exercise.level}
+                              sameSet={exercise.sameSet}
+                              workout={workoutDetails.workout?.id || ""}
+                              active={false}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <Text as="p" className="p-4 text-center">
+                          Inga övningar hittade för detta träningspass.
+                        </Text>
+                      )}
+                    </Card>
+                  ) : (
+                    <div className="h-full flex items-center justify-center border border-dashed rounded-md p-8 bg-gray-50">
+                      <Text
+                        as="p"
+                        color="gray"
+                        className="text-center text-base"
+                      >
+                        Välj ett träningspass för att se detaljer.
+                      </Text>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </SidebarProvider>

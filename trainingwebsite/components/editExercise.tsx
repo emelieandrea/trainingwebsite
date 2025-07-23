@@ -1,29 +1,51 @@
-"use client";
-import { PlusIcon } from "@radix-ui/react-icons";
-import {
-  Dialog,
-  Flex,
-  IconButton,
-  RadioGroup,
-  TextField,
-} from "@radix-ui/themes";
-import React, { useEffect, useRef, useState } from "react";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { Button } from "@heroui/react";
+import { doc, updateDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
-import { CustomButton } from "../components/ui/button";
+import { Dialog, Flex, RadioGroup, TextField } from "@radix-ui/themes";
+import { useEffect, useRef, useState } from "react";
+import { CustomButton } from "./ui/button";
 
-interface NewExerciseProps {
-  onExerciseAdded?: (id?: string, name?: string, type?: string) => void;
+interface Props {
+  exerciseId: string;
+  name: string;
+  type: string;
+  description: string;
+  onEdit?: () => void;
 }
 
-const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
+const EditExercise: React.FC<Props> = ({
+  exerciseId,
+  name,
+  type,
+  description,
+  onEdit,
+}) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(type);
   const [toolsList, setTools] = useState<{ id: string; name: string }[]>([]);
 
   const nameRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Function to set input values when dialog opens
+  const handleDialogOpen = (open: boolean) => {
+    setDialogOpen(open);
+    if (open) {
+      // This will run when the dialog opens
+      setValue(type);
+
+      // Need to use setTimeout because the refs might not be set immediately
+      setTimeout(() => {
+        if (nameRef.current) {
+          nameRef.current.value = name;
+        }
+        if (descriptionRef.current) {
+          descriptionRef.current.value = description;
+        }
+      }, 0);
+    }
+  };
 
   useEffect(() => {
     const fetchTools = async () => {
@@ -40,33 +62,23 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
     fetchTools();
   }, []);
 
-  const saveExercise = async () => {
-    const name = nameRef.current?.value || "";
-    const description = descriptionRef.current?.value || "";
-
-    if (name && description && value) {
-      try {
-        const docRef = await addDoc(collection(db, "exerciseBank"), {
-          name,
-          description,
-          type: value,
-        });
-        console.log("Exercise saved successfully!");
-        setErrorMessage("");
-        setDialogOpen(false);
-
-        // Call the callback function if provided
-        if (onExerciseAdded) {
-          onExerciseAdded(docRef.id, name, value); // Pass ID, name, and type
-        }
-      } catch (error) {
-        console.error("Error saving exercise: ", error);
-        setErrorMessage("Det gick inte att spara övningen. Försök igen.");
+  const edit = async () => {
+    try {
+      const exerciseDocRef = doc(db, "exerciseBank", exerciseId);
+      await updateDoc(exerciseDocRef, {
+        name: nameRef.current?.value || "",
+        type: value,
+        description: descriptionRef.current?.value || "",
+      });
+      if (onEdit) {
+        onEdit(); // Call the callback function if provided
       }
-    } else {
-      setErrorMessage("Du måste fylla i alla fälten.");
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error editing workout:", error);
     }
   };
+
   const closeDialog = () => {
     setErrorMessage("");
     setDialogOpen(false);
@@ -74,17 +86,17 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
 
   return (
     <div>
-      <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog.Root open={dialogOpen} onOpenChange={handleDialogOpen}>
         <Dialog.Trigger>
-          <IconButton className="hover:cursor-pointer" variant="surface">
-            <PlusIcon width="18" height="18" />
-          </IconButton>
+          <Button size="sm" className="mx-2">
+            Redigera övning
+          </Button>
         </Dialog.Trigger>
 
         <Dialog.Content maxWidth="350px" minHeight="h-full">
-          <Dialog.Title>Lägg till en övning</Dialog.Title>
+          <Dialog.Title>Redigera övning</Dialog.Title>
           <Dialog.Description size="2" mb="4">
-            Övningen läggs till för alla användare.
+            Övningen ändras för alla användare.
           </Dialog.Description>
 
           <Flex direction="column" gap="3">
@@ -93,6 +105,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
               <TextField.Root
                 ref={nameRef}
                 placeholder="Lägg till övningens namn"
+                defaultValue={name}
               />
             </label>
             <label>
@@ -100,6 +113,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
               <TextField.Root
                 ref={descriptionRef}
                 placeholder="Lägg till en beskrivning"
+                defaultValue={description}
               />
             </label>
             <Flex direction={"column"} gap="2">
@@ -128,12 +142,11 @@ const NewExercise: React.FC<NewExerciseProps> = ({ onExerciseAdded }) => {
             <CustomButton color="gray" onClick={closeDialog}>
               Avbryt
             </CustomButton>
-            <CustomButton onClick={saveExercise}>Spara</CustomButton>
+            <CustomButton onClick={edit}>Spara</CustomButton>
           </Flex>
         </Dialog.Content>
       </Dialog.Root>
     </div>
   );
 };
-
-export default NewExercise;
+export default EditExercise;

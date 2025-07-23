@@ -22,7 +22,6 @@ const DeleteExercise: React.FC<Props> = ({ exerciseId, onDelete }) => {
     try {
       await deleteDoc(doc(db, "exerciseBank", exerciseId));
       console.log("Exercise deleted successfully");
-      // Call the onDelete callback if provided
       if (onDelete) {
         onDelete();
       }

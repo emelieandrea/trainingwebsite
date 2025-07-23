@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { collection, deleteDoc, doc, getDocs, query } from "firebase/firestore";
 import { db } from "../../firebase";
-import { Button } from "@heroui/react";
 import DeleteExercise from "../../components/deleteExercise";
+import EditExercise from "../../components/editExercise";
 
 type Exercises = {
   id: string;
@@ -39,16 +39,6 @@ export default function Exercises({}: Props) {
     }
   };
 
-  const removeExercise = async (id: any) => {
-    try {
-      await deleteDoc(doc(db, "exerciseBank", id));
-      console.log("Exercise removed successfully");
-      fetchWorkout();
-    } catch (error) {
-      console.error("Error removing exercise:", error);
-    }
-  };
-
   useEffect(() => {
     if (!user || loading) return;
     fetchWorkout();
@@ -66,16 +56,26 @@ export default function Exercises({}: Props) {
             {exercises.map((exercise) => (
               <div
                 key={exercise.id}
-                className="w-4/5 border rounded-md flex justify-between items-center p-3 mx-8"
+                className="w-7/8 border rounded-md flex justify-between items-center p-3 mx-8"
               >
-                <div className="w-2/3">
-                  <p className="text-xl font-bold text-left">{exercise.name}</p>
+                <div className="grid grid-row w-1/2">
+                  <p className="text-l font-bold text-left">{exercise.name}</p>
+                  <p className="text-sm text-left text-gray-400">
+                    {exercise.type}
+                  </p>
                   <p className="text-sm text-left">{exercise.description}</p>
                 </div>
-                <div className="w-1/3 justify-end flex gap-2">
+                <div className="grid grid-column w-3/7 justify-end gap-2">
                   <DeleteExercise
                     exerciseId={exercise.id}
                     onDelete={fetchWorkout}
+                  />
+                  <EditExercise
+                    exerciseId={exercise.id}
+                    name={exercise.name}
+                    type={exercise.type}
+                    description={exercise.description}
+                    onEdit={fetchWorkout}
                   />
                 </div>
               </div>

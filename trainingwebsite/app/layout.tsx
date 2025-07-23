@@ -5,6 +5,7 @@ import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import { AuthProvider } from "../Context/AuthContext";
 import { HeroUIProvider } from "@heroui/react";
+import { Toaster } from "../components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
             <HeroUIProvider>{children}</HeroUIProvider>
           </Theme>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

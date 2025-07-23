@@ -1,8 +1,8 @@
 "use client";
 
 import { Flex, TextField } from "@radix-ui/themes";
-import React, { useRef, useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import React, { useEffect, useRef, useState } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useRouter } from "next/navigation";
 import { Button } from "@radix-ui/themes";
@@ -11,10 +11,18 @@ import {
   today,
   getLocalTimeZone,
   type DateValue,
+  parseDate,
 } from "@internationalized/date";
 
 interface Props {
   workout: string;
+}
+
+interface WorkoutData {
+  name?: string;
+  date?: string;
+  gym?: string;
+  finished?: boolean;
 }
 
 const SaveWorkout: React.FC<Props> = ({ workout }) => {
@@ -23,12 +31,62 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const nameRef = useRef<HTMLInputElement>(null);
   const gymRef = useRef<HTMLInputElement>(null);
+  const [workoutData, setWorkoutData] = useState<WorkoutData>({});
+  const [workoutName, setWorkoutName] = useState("");
+  const [gymName, setGymName] = useState("");
 
   // Use DateValue instead of Date for selectedDate
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(
     // Initialize with today's date using the proper function
     today(getLocalTimeZone())
   );
+
+  // Fetch workout data when component mounts
+  useEffect(() => {
+    const fetchWorkoutData = async () => {
+      if (!workout) return;
+
+      try {
+        const workoutDocRef = doc(db, "workouts", workout);
+        const workoutSnapshot = await getDoc(workoutDocRef);
+
+        if (workoutSnapshot.exists()) {
+          const data = workoutSnapshot.data() as WorkoutData;
+          setWorkoutData(data);
+
+          // Set form values if data exists
+          if (data.name) setWorkoutName(data.name);
+          if (data.gym) setGymName(data.gym);
+
+          // Parse date if it exists
+          if (data.date) {
+            try {
+              // Create a Date object from the ISO string
+              const date = new Date(data.date);
+              
+              // Get the local date components to avoid timezone issues
+              const year = date.getFullYear();
+              const month = date.getMonth() + 1; // getMonth() is 0-indexed
+              const day = date.getDate();
+              
+              // Format properly for parseDate (YYYY-MM-DD)
+              const dateStr = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+              console.log("Parsing date string:", dateStr);
+              
+              const parsedDate = parseDate(dateStr);
+              setSelectedDate(parsedDate);
+            } catch (error) {
+              console.error("Error parsing date:", error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching workout data:", error);
+      }
+    };
+
+    fetchWorkoutData();
+  }, [workout]);
 
   // Save workout
   const saveWorkout = async () => {
@@ -37,13 +95,22 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
 
       // Convert DateValue to native Date for storage
       const nativeDate = selectedDate.toDate(getLocalTimeZone());
-
+      
+      // Ensure we're saving the date properly with the timezone taken into account
+      // We'll set the time to noon to avoid timezone day shifts
+      const year = nativeDate.getFullYear();
+      const month = nativeDate.getMonth(); // JavaScript's Date month is 0-indexed
+      const day = nativeDate.getDate();
+      
+      // Create a new date with noon time to avoid timezone issues
+      const fixedDate = new Date(year, month, day, 12, 0, 0);
+      
       try {
         await updateDoc(workoutDocRef, {
           finished: true,
-          date: nativeDate.toISOString(),
-          name: nameRef.current?.value || "Unnamed Workout",
-          gym: gymRef.current?.value || "Unnamed Gym",
+          date: fixedDate.toISOString(),
+          name: workoutName || "Unnamed Workout",
+          gym: gymName || "Unnamed Gym",
         });
         router.push("/workouts");
       } catch (error) {
@@ -63,8 +130,8 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
   };
 
   return (
-    <div className="w-full px-4 sm:px-0 max-w-md mx-auto">
-      <div className="bg-white p-5 rounded-lg shadow-sm border">
+    <div className="w-full px-0">
+      <div className="bg-white p-5">
         <h2 className="text-lg font-semibold mb-4">Spara träningspass</h2>
         <Flex direction="column" gap="4">
           <label>
@@ -73,8 +140,10 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
             </span>
             <TextField.Root
               ref={nameRef}
-              placeholder="Lägg till träningspassets namn"
+              placeholder="Träningspassets namn"
               className="w-full"
+              value={workoutName}
+              onChange={(e) => setWorkoutName(e.target.value)}
             />
           </label>
           <div className="w-full" onClick={(e) => e.stopPropagation()}>
@@ -94,8 +163,10 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
             </span>
             <TextField.Root
               ref={gymRef}
-              placeholder="Lägg till vilket gym du tränat på"
+              placeholder="Gymmets namn"
               className="w-full"
+              value={gymName}
+              onChange={(e) => setGymName(e.target.value)}
             />
           </label>
         </Flex>
@@ -111,6 +182,9 @@ const SaveWorkout: React.FC<Props> = ({ workout }) => {
             Spara träningspass
           </Button>
         </Flex>
+        <p className="justify-center text-red-600 text-sm mt-1">
+          Detta kommer att spara och avsluta träningspasset.
+        </p>
       </div>
     </div>
   );
