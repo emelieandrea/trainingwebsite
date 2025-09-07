@@ -37,11 +37,6 @@ interface Props {
 const AddExercise: React.FC<Props> = ({ workout }) => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
-
-  // For debugging mobile detection
-  useEffect(() => {
-    console.log("Is mobile device:", isMobile);
-  }, [isMobile]);
   const [checkboxChecked, setCheckboxChecked] = useState(true);
   const [checkboxLRChecked, setCheckboxLRChecked] = useState(false);
   const [numSets, setNumSets] = useState(1);
@@ -85,6 +80,18 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
   useEffect(() => {
     fetchExercises();
   }, []);
+
+  useEffect(() => {
+    if (selectedExercise) {
+      const fetchLatestExercise = async () => {
+        try {
+        } catch (error) {
+          console.error("Error fetching exercise:", error);
+        }
+      };
+      fetchLatestExercise();
+    }
+  }, [selectedExercise]);
 
   const handleSetChange = (e: { target: { value: string } }) => {
     const value = parseInt(e.target.value) || 1;
@@ -143,13 +150,8 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
           duration: 2000,
         });
         setSelectedExercise(null);
-        setLevel("2");
-        setCheckboxChecked(true);
-        setCheckboxLRChecked(false);
-        console.log("returned states to default");
       } catch (error) {
         console.error("Error adding exercise:", error);
-        // Show desktop error toast
         toast({
           title: "Något gick fel",
           description:
@@ -171,7 +173,6 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
           <Box width="100%" className="max-w-full mx-0">
             <Card className="shadow-sm rounded-none">
               <Flex direction="column" gap="4" align="baseline" className="p-1">
-                {/* Same content as desktop version */}
                 <Flex direction="row" gap="3" align="center" className="w-full">
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
@@ -179,7 +180,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full justify-between py-2 px-3 text-base"
+                        className="w-full max-w-[300px] justify-between py-2 px-3 text-base"
                       >
                         {selectedExercise ? (
                           <>
@@ -215,7 +216,6 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                                   const selected = exercises.find(
                                     (ex) => ex.name === currentValue
                                   );
-
                                   if (selected) {
                                     setSelectedExercise({
                                       id: selected.id,
@@ -225,7 +225,6 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                                   } else {
                                     setSelectedExercise(null);
                                   }
-
                                   setOpen(false);
                                 }}
                               >
@@ -260,6 +259,7 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                     }}
                   />
                 </Flex>
+                {selectedExercise ? <div></div> : <div></div>}
                 <Flex direction="column" gap="4" className="w-full">
                   <div className="w-full">
                     <label className="block mb-1 text-sm font-medium">
