@@ -556,6 +556,9 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                           onChange={(e) =>
                             handleInputChange(index, "weight", e.target.value)
                           }
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                         />
                       </label>
                       <label className="flex-1">
@@ -569,6 +572,9 @@ const AddExercise: React.FC<Props> = ({ workout }) => {
                           onChange={(e) =>
                             handleInputChange(index, "reps", e.target.value)
                           }
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                         />
                       </label>
                     </div>
